@@ -1,0 +1,1 @@
+SYSTEM_REBOOT_CMD = '/sbin/reboot'
