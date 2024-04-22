@@ -1,0 +1,16 @@
+[Unit]
+Description=Service for remote controle device via Telegram
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=orangepi
+Group=orangepi
+ExecStart=/home/orangepi/.scripts/cntl/.venv/bin/python /home/orangepi/.scripts/cntl/main.py
+WorkingDirectory=/home/orangepi/.scripts/cntl/
+Restart=always
+
+
+[Install]
+WantedBy=multi-user.target
