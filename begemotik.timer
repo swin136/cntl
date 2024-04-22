@@ -1,0 +1,10 @@
+[Unit]
+Description=Service for remote controle device via Telegram
+
+
+[Timer]
+Unit=begemotik.service
+OnBootSec=300
+
+[Install]
+WantedBy=multi-user.target
