@@ -11,6 +11,5 @@ ExecStart=/home/orangepi/.scripts/cntl/.venv/bin/python /home/orangepi/.scripts/
 WorkingDirectory=/home/orangepi/.scripts/cntl/
 Restart=always
 
-
 [Install]
 WantedBy=multi-user.target
