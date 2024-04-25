@@ -8,6 +8,7 @@ import aiohttp.client_exceptions
 from config import USER_TLG_IDS
 
 import os
+import subprocess
 
 import asyncio
 import aiofiles
@@ -18,9 +19,14 @@ import math
 from app_text import SYSTEM_REBOOT_CMD
 from app_text import HELLO_MSG, REBOOT_MSG, STATUS_ANSWER_MSG, MEM_INFO_FILE, THERMAL_FILE, UPTIME_INFO_FILE 
 from app_text import NO_TEMP_FOUND, NET_DEVICE_CARRIER_FILE, SYSTEM_DOWN_NETWORK_CMD, LINK_OFF_MSG, LINK_ON_MSG, SYSTEM_UP_NETWORK_CMD 
-from app_text import RESTORE_ROUTE
+from app_text import RESTORE_ROUTE, NO_INTERFACE_DATA, IP_LOG_FILE, ERROR_IP_LOG, GATEWAY_LOG_FILE 
+from app_text import OS_RELEASE_INFO, OS_RELEASE_INFO, SHOW_CPU_INFO, KERNEL_VERSION_FILE, HOSTNAME_FILE
+from app_text import OS_DF_INFO, ERROR_DEVICE_GET_DATA  
+from app_text import STATUS_BUTTON, REBOOT_BUTTON, CONNECT_TO_BARS, DISCONNET_FROM_BARS
+
 
 from kb import keyboard
+
 
 
 EMPTY_MSG = "NO_CONTENTS"
@@ -36,7 +42,7 @@ APP_DELAY = 5
 # Время удаления сообщения
 TIME_DELETE = 50
 
-from app_text import STATUS_BUTTON, REBOOT_BUTTON, CONNECT_TO_BARS, DISCONNET_FROM_BARS
+
 
 
 router = Router()
@@ -83,8 +89,7 @@ async def start_handler(msg: Message):
                     elif record[0] == 'Cached':
                         memory_device['Cached'] = int(record[1].strip()[:-2].strip())
 
-            # print(memory_device)
-            # Расчитваем процент загрузки памяти
+            # Расчитываем процент загрузки памяти
             used_memory_percent = round((memory_device['MemTotal'] - memory_device['MemFree'] - memory_device['Buffers'] - memory_device['Cached']) * 100 / memory_device['MemTotal'])
             memory_msg = f"Занято памяти: <b>{used_memory_percent}%</b> из <b>{memory_device['MemTotal'] / (1024 * 1024):.2f}</b> Гб"
         except FileNotFoundError:
@@ -248,10 +253,189 @@ async def start_handler(msg: Message):
 @router.message(Command("help"))
 async def start_handler(msg: Message):
     if msg.from_user.id in USER_TLG_IDS:
-        help_msg = "Команды бота помощника:\n/status - получить статус устройства\n" + "/reboot - перегрузить устройство\n"
-        help_msg = help_msg + "/linkon - подключиться к МИС 'Барс'.\n/linkoff - отключиться от МИС 'Барс'\n"
+        help_msg = "Команды бота помощника:\n/reboot - перегрузить устройство\n" + "/status - получить статус устройства\n"
+        help_msg = help_msg + "/linkon - подключиться к МИС 'Барс'\n/linkoff - отключиться от МИС 'Барс'\n"
+        help_msg = help_msg + '/addr - данные по сетевым адресам устройства\n'
+        help_msg = help_msg + '/route - таблица маршрутизации устройства\n'
+        help_msg = help_msg + '/lastip - последний полученный ip-адрес по DHCP\n'
+        help_msg = help_msg + '/info - информация об устройстве\n'
         help_msg = help_msg + "/help - вывести справку по командам бота"
         await msg.answer(help_msg)
-        # создаем задачу по удалению исходного сообщение с командой
+        # создаем задачу по удалению исходного сообщения с командой
         asyncio.create_task(delete_message(msg, TIME_DELETE))
 
+# Выводим адреса устройства
+@router.message(Command("addr"))
+async def start_handler(msg: Message):
+    show_interface_cmd = '/sbin/ifconfig'
+    if msg.from_user.id in USER_TLG_IDS:
+        interfaces = {'eth0': '', 
+                      'wlan0': '',
+                      }
+        for interface in interfaces.keys():
+            try:
+                result = subprocess.run([show_interface_cmd, interface], stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
+                interfaces[interface] = result.stdout.strip().split("\n")[1].split()[1]
+            except IndexError:
+                interfaces[interface] = NO_INTERFACE_DATA
+        interfaces_msg = '<b>Данные по сетевым интерефейсам устройства</b>:\n'
+        for interface in interfaces.keys():
+            interfaces_msg = interfaces_msg + f"<u>{interface}</u>: {interfaces[interface]}\n"
+
+        await msg.answer(interfaces_msg)
+        # создаем задачу по удалению исходного сообщения с командой
+        asyncio.create_task(delete_message(msg, TIME_DELETE))
+
+# Выводим сведения о маршрутизации устройства
+@router.message(Command("route"))
+async def start_handler(msg: Message):
+    if msg.from_user.id in USER_TLG_IDS:
+        result = subprocess.run(['/sbin/ip', 'r'], stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
+        route_msg = "<b>Таблица маршрутизации устройства:</b>\n"+result.stdout.strip()
+        await msg.answer(route_msg)
+        # создаем задачу по удалению исходного сообщения с командой
+        asyncio.create_task(delete_message(msg, TIME_DELETE))
+
+
+# Выводим сведения о последнем полученном ip-адресе
+# проводным интефейсом через DHCP
+@router.message(Command("lastip"))
+async def start_handler(msg: Message):
+    if msg.from_user.id in USER_TLG_IDS:
+            try:
+                # Считываем данные о сетевых интерфейсах
+                contents = []
+                async with aiofiles.open(IP_LOG_FILE, mode='r') as linux_file:
+                    async for line in linux_file:
+                        contents.append(line)
+                test_ip = contents[len(contents) - 1].strip().split()
+                # print(test_ip)
+                if test_ip[0] != 'inet' or test_ip[2] != 'netmask':
+                    raise ValueError
+                mgs_last_ip = "<b>Последняя запись о сетевом адресе, полученном от DHCP-сервера</b>:\n" 
+                mgs_last_ip = mgs_last_ip + f'<u>ip-адрес</u>:{test_ip[1]}\n<u>сетевая маска</u>: {test_ip[3]}\n'
+
+                # Считываем данные о шлюзе
+                contents = []
+                async with aiofiles.open(GATEWAY_LOG_FILE, mode='r') as linux_file:
+                    async for line in linux_file:
+                        contents.append(line)
+
+                test_gateway = contents[len(contents) - 1].strip().split()
+                mgs_last_ip = mgs_last_ip + f'<u>сетевой шлюз</u>:{test_gateway[2]}'
+
+                await msg.answer(mgs_last_ip) 
+            except (FileNotFoundError, ValueError, IndexError):
+                # Ошибка при получении данных ip-адресах
+                await msg.answer(ERROR_IP_LOG)
+            # создаем задачу по удалению исходного сообщения с командой
+            asyncio.create_task(delete_message(msg, TIME_DELETE))
+
+# Выводим сведения о устройстве
+# UnboundLocalError
+@router.message(Command("info"))
+async def start_handler(msg: Message):
+    if msg.from_user.id in USER_TLG_IDS:
+        device_info_msg = "<b>Сведения об устройстве</b>:\n"
+        # Считываем информацию оБ имени машины
+        async with aiofiles.open(HOSTNAME_FILE, mode='r') as linux_file:
+                contents = await linux_file.read()
+        hostname_msg = f"Имя машины: <b>{contents.strip()}</b>\n"
+        device_info_msg = device_info_msg + hostname_msg 
+
+        try:
+            # Считываем информацию о процессоре - команда lscpu
+            result = subprocess.run([SHOW_CPU_INFO], stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
+            cpu_info = result.stdout.strip().split("\n")
+            for line in cpu_info:
+                test_line = line.split(":")
+                 # Архитектура ЦПУ
+                if test_line[0].strip().lower() == 'architecture':
+                        arch_type = f"Архитектура: <b>{test_line[1].strip().lower()}</b>\n"
+                        continue
+                # Количество ядер ЦПУ
+                if test_line[0].strip().lower() == 'cpu(s)':
+                        cpu_core_count = f"Количество ядер: <b>{test_line[1].strip().lower()}</b>\n"
+                        continue
+                # Модель ЦПУ
+                if test_line[0].strip().lower() == 'model name':
+                        model_name = f"Процессор: <b>{test_line[1].strip()}</b>\n"
+                        continue
+                # Минимальная частота ЦПУ
+                if test_line[0].strip().lower() == 'CPU min MHz'.lower():
+                        min_cpu_freq = f"Минимальная частота: <b>{test_line[1].strip().split(',')[0]} МГц</b>\n"
+                        continue
+                # Максимальная частота ЦПУ
+                if test_line[0].strip().lower() == 'CPU max MHz'.lower():
+                        max_cpu_freq = f"Максимальная частота: <b>{test_line[1].strip().split(',')[0]} МГц</b>\n"
+                        continue
+            device_info_msg =  device_info_msg + arch_type + model_name +  max_cpu_freq 
+            device_info_msg = device_info_msg + min_cpu_freq + cpu_core_count
+
+            # считываем релиз опреационной системы
+            result = subprocess.run(OS_RELEASE_INFO, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
+            release_info = result.stdout.strip().split("\n")
+            for release in release_info:
+                analyze_release = release.split(":")
+                if analyze_release[0].strip().lower() == 'Description'.lower():
+                    release_info_msg = f"Операционная система: <b>{analyze_release[1].strip()}</b>\n"
+                    break
+            
+            device_info_msg = device_info_msg + release_info_msg 
+            # Считываем информацию о версии ядра ОС
+            async with aiofiles.open(KERNEL_VERSION_FILE, mode='r') as linux_file:
+                contents = await linux_file.read()
+            hostname_msg = f"Версия ядра: <b>{contents.strip().split()[2].strip()}</b>\n"
+            device_info_msg = device_info_msg + hostname_msg 
+
+            # Считывае сведения о памяти и свопе
+            contents =[]
+            memory_device = {}
+            async with aiofiles.open(MEM_INFO_FILE, mode='r') as linux_file:
+                async for line in linux_file:
+                    contents.append(line)
+                    record = line.strip().split(':')
+                    if record[0] == "MemTotal":
+                        memory_device['MemTotal'] = int(record[1].strip()[:-2].strip())
+                    elif record[0] == 'MemFree':
+                        memory_device['MemFree'] = int(record[1].strip()[:-2].strip())
+                    elif record[0] == 'Buffers':
+                        memory_device['Buffers'] = int(record[1].strip()[:-2].strip())
+                    elif record[0] == 'Cached':
+                        memory_device['Cached'] = int(record[1].strip()[:-2].strip())
+                    elif record[0] == 'SwapTotal':
+                        memory_device['SwapTotal'] = int(record[1].strip()[:-2].strip())
+                    elif record[0] == 'SwapFree':
+                        memory_device['SwapFree'] = int(record[1].strip()[:-2].strip())
+
+            # Расчитываем процент загрузки памяти
+            used_memory_percent = round((memory_device['MemTotal'] - memory_device['MemFree'] - memory_device['Buffers'] - memory_device['Cached']) * 100 / memory_device['MemTotal'])
+            memory_msg = f"Оперативная память: занято <b>{used_memory_percent}%</b> из <b>{memory_device['MemTotal'] / (1024 * 1024):.2f}</b> Гб\n"
+            device_info_msg = device_info_msg + memory_msg
+            # Расчитываем процент загрузки свопа
+            used_swap_percent = round((memory_device['SwapTotal'] - memory_device['SwapFree']) * 100 / memory_device['MemTotal'])
+            swap_msg = f"Cвоп: занято <b>{used_swap_percent}%</b> из <b>{memory_device['SwapTotal'] / (1024 * 1024):.2f}</b> Гб\n"
+            device_info_msg = device_info_msg + swap_msg 
+
+            # OS_DF_INFO
+            # Сведения об использовании карты памяти
+            result = subprocess.run(OS_DF_INFO, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
+            partions_usage_raw = result.stdout.strip().split("\n")
+            for item in partions_usage_raw:
+                root_partion = item.split()
+                if root_partion[5].strip() == "/":
+                    break
+            
+            total_capacity = root_partion[1].strip()
+            if total_capacity[len(total_capacity) - 1] == "G":
+                total_capacity = total_capacity[:-1] + " Гб"
+            
+            root_usage_msg = f"Карта памяти: занято <b>{root_partion[4].strip()}</b> из <b>{total_capacity}</b>"
+            device_info_msg = device_info_msg + root_usage_msg 
+
+            await msg.answer(device_info_msg)            
+        except (UnboundLocalError, IndexError):
+            await msg.answer(ERROR_DEVICE_GET_DATA)
+       
+        # создаем задачу по удалению исходного сообщения с командой
+        asyncio.create_task(delete_message(msg, TIME_DELETE))
