@@ -9,6 +9,9 @@ AFTER_REBOOT_MSG = 'Бот на устройстве <b><I><u>Бегемотик
 
 
 NO_TEMP_FOUND = "Температура: <I>нет данных</I>"
+NO_INTERFACE_DATA = 'нет данных по сетевому интерфейсу'
+ERROR_IP_LOG = '<b>Ошибка</b> при получении данных о значениях <b>ip</b>-адресов, выданных DHCP-сервером.'
+ERROR_DEVICE_GET_DATA = 'При получении данных о параметрах устройства произошла ошибка.'
 
 # Кнопки меню бота
 STATUS_BUTTON = 'Статус устройства'
@@ -29,6 +32,15 @@ TARGET = '100.117.0.1'
 GTW = '192.168.1.1'
 
 RESTORE_ROUTE = f'sudo /sbin/ip route add {TARGET} via {GTW}'
+# Команда для получения информации о процессоре(ах)
+SHOW_CPU_INFO = 'lscpu'
+# Команда для получения информации о дистрибутиве ОВ
+OS_RELEASE_INFO = ['lsb_release', '-a']
+# Команда для получения информации о версии ядра ОС
+OS_RELEASE_INFO = ['lsb_release', '-a']
+# Команда для получения сведений об испольщованных разделах
+OS_DF_INFO = ['df', '-h']
+
 
 
 # Имена фалов из каталога /proc для получения данных о системе
@@ -40,3 +52,13 @@ THERMAL_FILE =  '/sys/devices/virtual/thermal/thermal_zone0/temp'
 UPTIME_INFO_FILE = '/proc/uptime'
 # файл для получения статуса интерфейса eth0
 NET_DEVICE_CARRIER_FILE =  '/sys/class/net/eth0/carrier'
+# Файл с логами ip-адресов, получаемых от DHCP-сервера по
+# проводному интерфейсу при вколючении устройства
+IP_LOG_FILE = '/home/orangepi/ip.log'
+# Файл с адресами шлюзов, полученных от DHCP по проводному 
+# интерфейсу при вколючении устройства
+GATEWAY_LOG_FILE = '/home/orangepi/route.log'
+# файл для получения версии ядра операционной системы
+KERNEL_VERSION_FILE = '/proc/version'
+# файл для получения имени хоста
+HOSTNAME_FILE = '/proc/sys/kernel/hostname'
