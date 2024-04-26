@@ -262,13 +262,13 @@ async def start_handler(msg: Message):
 async def start_handler(msg: Message):
     if msg.from_user.id in USER_TLG_IDS:
         help_msg = "Команды бота помощника:\n<b>/reboot</b> - <b><u>перегрузить устройство </u></b>" + "\U0001F198" + "\n"
-        help_msg = help_msg + "/status - получить статус устройства\n"
-        help_msg = help_msg + "/linkon - подключиться к МИС 'Барс'\n/linkoff - отключиться от МИС 'Барс'\n"
-        help_msg = help_msg + '/addr - данные по сетевым адресам устройства\n'
-        help_msg = help_msg + '/route - таблица маршрутизации устройства\n'
-        help_msg = help_msg + '/lastip - последний полученный ip-адрес по DHCP\n'
-        help_msg = help_msg + '/info - информация об устройстве\n'
-        help_msg = help_msg + "/help - вывести справку по командам бота"
+        help_msg = help_msg + "<b>/status</b> - получить статус устройства\n"
+        help_msg = help_msg + "<b>/linkon</b> - подключиться к МИС 'Барс'\n<b>/linkoff</b> - отключиться от МИС 'Барс'\n"
+        help_msg = help_msg + '<b>/addr</b> - данные по сетевым адресам устройства\n'
+        help_msg = help_msg + '<b>/route</b> - таблица маршрутизации устройства\n'
+        help_msg = help_msg + '<b>/lastip</b> - последний полученный ip-адрес по DHCP\n'
+        help_msg = help_msg + '<b>/info</b> - информация об устройстве\n'
+        help_msg = help_msg + "<b><I>/help</I></b> - вывести справку по командам бота"
         await msg.answer(help_msg)
         # создаем задачу по удалению исходного сообщения с командой
         asyncio.create_task(delete_message(msg, TIME_DELETE))
