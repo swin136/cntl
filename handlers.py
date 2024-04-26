@@ -25,7 +25,6 @@ from app_text import OS_DF_INFO, ERROR_DEVICE_GET_DATA
 from app_text import STATUS_BUTTON, HELP_BUTTON, CONNECT_TO_BARS, DISCONNET_FROM_BARS
 from app_text import SOURCE_WEB_SERVER_URL
 
-
 from kb import keyboard
 
 
@@ -38,9 +37,6 @@ APP_DELAY = 5
 
 # Время удаления сообщения
 TIME_DELETE = 50
-
-
-
 
 router = Router()
 
@@ -113,12 +109,25 @@ async def start_handler(msg: Message):
            system_timing_msg = NO_TEMP_FOUND
         else:
             system_timing = round(float(contents.split()[0]))
-            if system_timing > 3600:
+            if system_timing > 86_400:
+                days = int(math.floor((system_timing) / 86_400))
+                hours = int(math.floor((system_timing - days * 86_400) / 3_600))
+                minutes = int(math.floor((system_timing - (system_timing - days * 86_400) - (hours * 3_600))/60))
+                system_timing_msg = f"Время работы устройства: <b>{days}</b> д <b>{hours}</b> ч <b>{minutes}</b> мин."
+            elif system_timing > 3_600:
                 hours = int(math.floor((system_timing) / 3600))
                 minutes = int(math.floor((system_timing - (hours * 3600))/60))
                 system_timing_msg = f"Время работы устройства: <b>{hours}</b> ч <b>{minutes}</b> мин."
             else:
                 system_timing_msg = f"Время работы устройства: <b>{round(system_timing/60)}</b> мин."
+
+            # system_timing = round(float(contents.split()[0]))
+            # if system_timing > 3600:
+            #     hours = int(math.floor((system_timing) / 3600))
+            #     minutes = int(math.floor((system_timing - (hours * 3600))/60))
+            #     system_timing_msg = f"Время работы устройства: <b>{hours}</b> ч <b>{minutes}</b> мин."
+            # else:
+            #     system_timing_msg = f"Время работы устройства: <b>{round(system_timing/60)}</b> мин."
 
         # Параметры проводного интерфейса
         must_access__web_server = False
@@ -252,7 +261,7 @@ async def start_handler(msg: Message):
 @router.message(F.text.lower() == HELP_BUTTON.lower())
 async def start_handler(msg: Message):
     if msg.from_user.id in USER_TLG_IDS:
-        help_msg = "Команды бота помощника:\n/reboot - <b><u>перегрузить устройство</u></b> "+'\U0001F198'+"\n" + "/status - получить статус устройства\n"
+        help_msg = "Команды бота помощника:\n<b>/reboot</b> - <b><u>перегрузить устройство</u></b> "+'\U0001F198'+"\n" + "/status - получить статус устройства\n"
         help_msg = help_msg + "/linkon - подключиться к МИС 'Барс'\n/linkoff - отключиться от МИС 'Барс'\n"
         help_msg = help_msg + '/addr - данные по сетевым адресам устройства\n'
         help_msg = help_msg + '/route - таблица маршрутизации устройства\n'
@@ -343,6 +352,26 @@ async def start_handler(msg: Message):
         device_info_msg = device_info_msg + hostname_msg 
 
         try:
+            # Время непрерывной работы
+            async with aiofiles.open(UPTIME_INFO_FILE, mode='r') as linux_file:
+                contents = await linux_file.read()
+
+            system_timing = round(float(contents.split()[0]))
+
+            if system_timing > 86_400:
+                days = int(math.floor((system_timing) / 86_400))
+                hours = int(math.floor((system_timing - days * 86_400) / 3600))
+                minutes = int(math.floor((system_timing - (system_timing - days * 86_400) - (hours * 3600))/60))
+                system_timing_msg = f"Работа устройства: <b>{days}</b> д <b>{hours}</b> ч <b>{minutes}</b> мин.\n"
+            elif system_timing > 3600:
+                hours = int(math.floor((system_timing) / 3600))
+                minutes = int(math.floor((system_timing - (hours * 3600))/60))
+                system_timing_msg = f"Работа устройства: <b>{hours}</b> ч <b>{minutes}</b> мин.\n"
+            else:
+                system_timing_msg = f"Работа устройства: <b>{round(system_timing/60)}</b> мин.\n"
+
+            device_info_msg =  device_info_msg + system_timing_msg    
+
             # Считываем информацию о процессоре - команда lscpu
             result = subprocess.run([SHOW_CPU_INFO], stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
             cpu_info = result.stdout.strip().split("\n")
