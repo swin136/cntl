@@ -20,7 +20,7 @@ CONNECT_TO_BARS = 'Подключиться к "Барсу"'
 DISCONNET_FROM_BARS = 'Отключиться от "Барса"'
 
 # Команда оболочки для перезагрузки системы 
-SYSTEM_REBOOT_CMD = '/sbin/reboot'
+SYSTEM_REBOOT_CMD = '/sbin/shutdown -r +2'
 
 # Команды оболочки для включения/отключения интерфейса
 # ВАЖНО! Требуются изменения в файле /etc/sudoerrs (я внес такие)
