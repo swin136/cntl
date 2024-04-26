@@ -248,6 +248,8 @@ async def start_handler(msg: Message):
         # await msg.answer(REBOOT_MSG)
         await asyncio.sleep(2)
         os.system(SYSTEM_REBOOT_CMD)
+        # создаем задачу по удалению исходного сообщение
+        asyncio.create_task(delete_message(msg, TIME_DELETE))
 
 # Сообщаем команды бота
 @router.message(Command("help"))
