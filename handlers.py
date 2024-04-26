@@ -22,17 +22,14 @@ from app_text import NO_TEMP_FOUND, NET_DEVICE_CARRIER_FILE, SYSTEM_DOWN_NETWORK
 from app_text import RESTORE_ROUTE, NO_INTERFACE_DATA, IP_LOG_FILE, ERROR_IP_LOG, GATEWAY_LOG_FILE 
 from app_text import OS_RELEASE_INFO, OS_RELEASE_INFO, SHOW_CPU_INFO, KERNEL_VERSION_FILE, HOSTNAME_FILE
 from app_text import OS_DF_INFO, ERROR_DEVICE_GET_DATA  
-from app_text import STATUS_BUTTON, REBOOT_BUTTON, CONNECT_TO_BARS, DISCONNET_FROM_BARS
+from app_text import STATUS_BUTTON, HELP_BUTTON, CONNECT_TO_BARS, DISCONNET_FROM_BARS
+from app_text import SOURCE_WEB_SERVER_URL
 
 
 from kb import keyboard
 
 
-
 EMPTY_MSG = "NO_CONTENTS"
-
-# URL_WEB_Server
-SOURCE_WEB_SERVER_URL = 'http://192.168.1.1'
 
 # Задержка выполнения бота
 APP_DELAY = 5
@@ -237,7 +234,6 @@ async def start_handler(msg: Message):
 
 # Отправляем команду на перезагрузку
 @router.message(Command("reboot"))
-@router.message(F.text.lower() == REBOOT_BUTTON.lower())
 async def start_handler(msg: Message):
     if msg.from_user.id in USER_TLG_IDS:
         for item in USER_TLG_IDS:
@@ -253,9 +249,10 @@ async def start_handler(msg: Message):
 
 # Сообщаем команды бота
 @router.message(Command("help"))
+@router.message(F.text.lower() == HELP_BUTTON.lower())
 async def start_handler(msg: Message):
     if msg.from_user.id in USER_TLG_IDS:
-        help_msg = "Команды бота помощника:\n/reboot - перегрузить устройство\n" + "/status - получить статус устройства\n"
+        help_msg = "Команды бота помощника:\n/reboot - <b><u>перегрузить устройство</u></b> "+'\U0001F198'+"\n" + "/status - получить статус устройства\n"
         help_msg = help_msg + "/linkon - подключиться к МИС 'Барс'\n/linkoff - отключиться от МИС 'Барс'\n"
         help_msg = help_msg + '/addr - данные по сетевым адресам устройства\n'
         help_msg = help_msg + '/route - таблица маршрутизации устройства\n'
