@@ -15,7 +15,7 @@ ERROR_DEVICE_GET_DATA = 'При получении данных о параме�
 
 # Кнопки меню бота
 STATUS_BUTTON = 'Статус устройства'
-REBOOT_BUTTON = 'Перегрузить устройство'
+HELP_BUTTON = 'Команды бота'
 CONNECT_TO_BARS = 'Подключиться к "Барсу"'
 DISCONNET_FROM_BARS = 'Отключиться от "Барса"'
 
@@ -62,3 +62,7 @@ GATEWAY_LOG_FILE = '/home/orangepi/route.log'
 KERNEL_VERSION_FILE = '/proc/version'
 # файл для получения имени хоста
 HOSTNAME_FILE = '/proc/sys/kernel/hostname'
+
+# URL_WEB_Server
+SOURCE_WEB_SERVER_URL = 'http://192.168.1.1'
+
