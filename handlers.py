@@ -261,7 +261,8 @@ async def start_handler(msg: Message):
 @router.message(F.text.lower() == HELP_BUTTON.lower())
 async def start_handler(msg: Message):
     if msg.from_user.id in USER_TLG_IDS:
-        help_msg = "Команды бота помощника:\n<b>/reboot</b> - <b><u>перегрузить устройство</u></b> "+'\U0001F198'+"\n" + "/status - получить статус устройства\n"
+        help_msg = "Команды бота помощника:\n<b>/reboot</b> - <b><u>перегрузить устройство </u></b>" + "\U0001F198" + "\n"
+        help_msg = help_msg + "/status - получить статус устройства\n"
         help_msg = help_msg + "/linkon - подключиться к МИС 'Барс'\n/linkoff - отключиться от МИС 'Барс'\n"
         help_msg = help_msg + '/addr - данные по сетевым адресам устройства\n'
         help_msg = help_msg + '/route - таблица маршрутизации устройства\n'
@@ -361,13 +362,13 @@ async def start_handler(msg: Message):
                 days = int(math.floor((system_timing) / 86_400))
                 hours = int(math.floor((system_timing - days * 86_400) / 3600))
                 minutes = int(math.floor((system_timing - (days * 86_400) - (hours * 3600))/60))
-                system_timing_msg = f"Работа устройства: <b>{days}</b> д <b>{hours}</b> ч <b>{minutes}</b> мин.\n"
+                system_timing_msg = f"Непрерывная работа: <b>{days}</b> д <b>{hours}</b> ч <b>{minutes}</b> мин.\n"
             elif system_timing > 3600:
                 hours = int(math.floor((system_timing) / 3600))
                 minutes = int(math.floor((system_timing - (hours * 3600))/60))
-                system_timing_msg = f"Работа устройства: <b>{hours}</b> ч <b>{minutes}</b> мин.\n"
+                system_timing_msg = f"Непрерывная работа: <b>{hours}</b> ч <b>{minutes}</b> мин.\n"
             else:
-                system_timing_msg = f"Работа устройства: <b>{round(system_timing/60)}</b> мин.\n"
+                system_timing_msg = f"Непрерывная работа: <b>{round(system_timing/60)}</b> мин.\n"
 
             device_info_msg =  device_info_msg + system_timing_msg    
 
