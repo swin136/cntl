@@ -112,7 +112,7 @@ async def start_handler(msg: Message):
             if system_timing > 86_400:
                 days = int(math.floor((system_timing) / 86_400))
                 hours = int(math.floor((system_timing - days * 86_400) / 3_600))
-                minutes = int(math.floor((system_timing - (system_timing - days * 86_400) - (hours * 3_600))/60))
+                minutes = int(math.floor((system_timing - (days * 86_400) - (hours * 3_600))/60))
                 system_timing_msg = f"Время работы устройства: <b>{days}</b> д <b>{hours}</b> ч <b>{minutes}</b> мин."
             elif system_timing > 3_600:
                 hours = int(math.floor((system_timing) / 3600))
@@ -357,11 +357,10 @@ async def start_handler(msg: Message):
                 contents = await linux_file.read()
 
             system_timing = round(float(contents.split()[0]))
-
             if system_timing > 86_400:
                 days = int(math.floor((system_timing) / 86_400))
                 hours = int(math.floor((system_timing - days * 86_400) / 3600))
-                minutes = int(math.floor((system_timing - (system_timing - days * 86_400) - (hours * 3600))/60))
+                minutes = int(math.floor((system_timing - (days * 86_400) - (hours * 3600))/60))
                 system_timing_msg = f"Работа устройства: <b>{days}</b> д <b>{hours}</b> ч <b>{minutes}</b> мин.\n"
             elif system_timing > 3600:
                 hours = int(math.floor((system_timing) / 3600))
