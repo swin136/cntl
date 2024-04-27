@@ -327,6 +327,9 @@ async def start_handler(msg: Message):
                 mgs_last_ip = "<b>Последняя запись о сетевом адресе, полученном от DHCP-сервера</b>:\n" 
                 mgs_last_ip = mgs_last_ip + f'<u>ip-адрес</u>:{test_ip[1]}\n<u>сетевая маска</u>: {test_ip[3]}\n'
 
+                # Добавляем в сообщение широковещательный адрес
+                mgs_last_ip = mgs_last_ip + f'<u>Широковещательный адрес</u>: {test_ip[5]}\n'
+
                 # Считываем данные о шлюзе
                 contents = []
                 async with aiofiles.open(GATEWAY_LOG_FILE, mode='r') as linux_file:
