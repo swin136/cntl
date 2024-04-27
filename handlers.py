@@ -36,7 +36,10 @@ APP_DELAY = 5
 # aiohttp.client_exceptions.ClientConnectorError:
 
 # Время удаления сообщения
-TIME_DELETE = 50
+TIME_DELETE = 20
+
+# Порог предупреждений по логам 
+LEVEL_LOG_WARNING = 70
 
 router = Router()
 
@@ -154,7 +157,7 @@ async def start_handler(msg: Message):
                         if response.status == 200:
                             await msg.answer('\U00002705' + f" Веб-сервер МИС Барс <b>ДОСТУПЕН!</b>!")
                         else:
-                            await msg.answer('\U000026A0' + f" Пробелемы с доступом к веб-серверу <b>МИС Барс</b>!")
+                            await msg.answer('\U000026A0' + f" Проблемы с доступом к веб-серверу <b>МИС Барс</b>!")
                         # await msg.answer(f"Статус ответа от веб-сервера {SOURCE_WEB_SERVER_URL}: {response.status}")
                 except aiohttp.client_exceptions.ClientConnectionError:
                     await msg.answer('\U0001F534' + f" Веб-сервер МИС Барс <b>НЕДОСТУПЕН!</b>!")
@@ -446,23 +449,45 @@ async def start_handler(msg: Message):
             device_info_msg = device_info_msg + swap_msg 
 
             # OS_DF_INFO
-            # Сведения об использовании карты памяти
+            # Сведения об использовании карты памяти и раздела с логами
             result = subprocess.run(OS_DF_INFO, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
             partions_usage_raw = result.stdout.strip().split("\n")
             for item in partions_usage_raw:
                 root_partion = item.split()
                 if root_partion[5].strip() == "/":
-                    break
-            
-            total_capacity = root_partion[1].strip()
+                    root_info = root_partion
+                    continue
+                if root_partion[5].strip() == "/var/log":
+                    log_info = root_partion
+                
+            total_capacity = root_info[1].strip()
             if total_capacity[len(total_capacity) - 1] == "G":
                 total_capacity = total_capacity[:-1] + " Гб"
             
-            root_usage_msg = f"Карта памяти: занято <b>{root_partion[4].strip()}</b> из <b>{total_capacity}</b>"
+            root_usage_msg = f"Карта памяти: занято <b>{root_info[4].strip()}</b> из <b>{total_capacity}</b>\n"
+
             device_info_msg = device_info_msg + root_usage_msg 
 
+            # # Добавляем сообщение об использовании раздела с логами
+            total_capacity = log_info[1].strip()
+            if total_capacity[len(total_capacity) - 1] == "G":
+                total_capacity = total_capacity[:-1] + " Гб"
+            elif total_capacity[len(total_capacity) - 1] == "M":
+                total_capacity = total_capacity[:-1] + " Мб"
+
+            log_usage_msg = f"Логи: занято <b>{log_info[4].strip()}</b> из <b>{total_capacity}</b>"
+
+            log_level_count = int(log_info[4].strip()[:-1])
+            if log_level_count > LEVEL_LOG_WARNING:
+                log_usage_msg = log_usage_msg + ' \U0001F198\n' #' \U0001F534\n'
+            else:
+                log_usage_msg = log_usage_msg + "\n"
+
+            device_info_msg = device_info_msg + log_usage_msg
+
             await msg.answer(device_info_msg)            
-        except (UnboundLocalError, IndexError):
+        except (UnboundLocalError, IndexError) as _exp:
+            # await msg.answer(str(_exp))
             await msg.answer(ERROR_DEVICE_GET_DATA)
        
         # создаем задачу по удалению исходного сообщения с командой
