@@ -1,6 +1,6 @@
 [Unit]
 Description=Service for remote controle device via Telegram
-Wants=myMonitor.timer
+Wants=begemotik.timer
 
 [Service]
 Type=simple
