@@ -1,7 +1,6 @@
 [Unit]
 Description=Service for remote controle device via Telegram
-After=network-online.target
-Wants=network-online.target
+Wants=myMonitor.timer
 
 [Service]
 Type=simple
