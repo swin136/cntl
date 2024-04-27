@@ -6,6 +6,7 @@ LINK_ON_MSG = 'Включаем связь с сетью <b>МИС "Барс"</b
 #REBOOT_NO_MSG = 'У бота нет прав для перезагрузки точки доступа к МИС "Барс".'
 STATUS_ANSWER_MSG = 'Считываем данные о параметрах точки доступа к <b>МИС "Барс"</b>.'
 AFTER_REBOOT_MSG = 'Бот на устройстве <b><I><u>Бегемотик</u></I></b> запущен.'
+AFTER_POWER_ON_OFF_MSG = 'Устройство запущено после <b>включения/выключения</b> питания. Возможны коллизии при работе! ' + '\U0001F198'
 
 
 NO_TEMP_FOUND = "Температура: <I>нет данных</I>"
@@ -40,6 +41,8 @@ OS_RELEASE_INFO = ['lsb_release', '-a']
 OS_RELEASE_INFO = ['lsb_release', '-a']
 # Команда для получения сведений об испольщованных разделах
 OS_DF_INFO = ['df', '-h']
+# Команда на создание файла-маяка, сигнализирующего о первом запуске платы
+OS_SEMAPHOR_CREATE = 'touch /tmp/orange.tmp'
 
 
 
@@ -62,6 +65,9 @@ GATEWAY_LOG_FILE = '/home/orangepi/route.log'
 KERNEL_VERSION_FILE = '/proc/version'
 # файл для получения имени хоста
 HOSTNAME_FILE = '/proc/sys/kernel/hostname'
+
+# файл-якорь первого включения
+FIRST_LAUNCH_FILE = '/tmp/orange.tmp'
 
 # URL_WEB_Server
 SOURCE_WEB_SERVER_URL = 'http://192.168.1.1'
