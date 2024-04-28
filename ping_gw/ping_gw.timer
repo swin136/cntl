@@ -1,0 +1,11 @@
+[Unit]
+Description=Service for ping wifi-router gateway
+
+
+[Timer]
+Unit=ping_gw.service
+OnBootSec=600
+OnUnitActiveSec=600
+
+[Install]
+WantedBy=multi-user.target
