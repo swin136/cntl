@@ -1,0 +1,12 @@
+[Unit]
+Description=Service for ping wifi-router gateway
+Wants=ping_gw.timer
+
+[Service]
+Type=oneshoot
+User=orangepi
+Group=orangepi
+ExecStart=/home/orangepi/.scripts/cntl/.venv/bin/python /home/orangepi/.scripts/cntl/ping_gw/ping_gw.py
+
+[Install]
+WantedBy=multi-user.target
