@@ -3,6 +3,7 @@ import asyncio
 import aiofiles
 import math
 import datetime
+from app_text import SYSTEM_REBOOT_CMD
 
 TARGET = "192.168.43.1"
 # TARGET = "lombard-alania1.ru"
@@ -13,7 +14,7 @@ TIME_KOEFF = 2
 
 # Файлы логов
 LOG_FILE = '/tmp/ping.log'
-ERROR_FILE = '/tmp/ping.err'
+ERROR_FILE = '/home/orangepi/ping.err'
 
 DEBUG_MODE = False
 
@@ -80,6 +81,14 @@ async def main():
         # Пишем лог об ошибке
         async with aiofiles.open(ERROR_FILE, mode='a') as log_file:
             await log_file.write(f"{datetime.datetime.now().strftime('%d-%m-%Y %H:%M:%S')} \n") 
+        # Отправка системы в ребут
+        await asyncio.sleep(5)
+        
+        proc = await asyncio.create_subprocess_shell(
+            cmd = SYSTEM_REBOOT_CMD,
+            stdout = asyncio.subprocess.DEVNULL            
+        )
+        await proc.communicate()
 
 
 
