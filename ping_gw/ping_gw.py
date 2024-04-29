@@ -3,7 +3,6 @@ import asyncio
 import aiofiles
 import math
 import datetime
-from app_text import SYSTEM_REBOOT_CMD
 
 TARGET = "192.168.43.1"
 # TARGET = "lombard-alania1.ru"
@@ -11,6 +10,7 @@ PACKET_COUNT = 10
 TEMPLATE = '% packet loss'
 LEVEL_ERROR = 80
 TIME_KOEFF = 2 
+REBOOT_CMD = '/sbin/shutdown -r +2'
 
 # Файлы логов
 LOG_FILE = '/tmp/ping.log'
@@ -85,7 +85,7 @@ async def main():
         await asyncio.sleep(5)
         
         proc = await asyncio.create_subprocess_shell(
-            cmd = SYSTEM_REBOOT_CMD,
+            cmd = REBOOT_CMD,
             stdout = asyncio.subprocess.DEVNULL            
         )
         await proc.communicate()
