@@ -89,6 +89,8 @@ async def start_handler(msg: Message):
             # Расчитываем процент загрузки памяти
             used_memory_percent = round((memory_device['MemTotal'] - memory_device['MemFree'] - memory_device['Buffers'] - memory_device['Cached']) * 100 / memory_device['MemTotal'])
             memory_msg = f"Занято памяти: <b>{used_memory_percent}%</b> из <b>{memory_device['MemTotal'] / (1024 * 1024):.2f}</b> Гб"
+            if used_memory_percent > 75:
+                memory_msg = memory_msg + ' \U000026A0'
         except FileNotFoundError:
             memory_msg = EMPTY_MSG
         # температура платы
@@ -449,7 +451,7 @@ async def start_handler(msg: Message):
             memory_msg = f"Оперативная память: занято <b>{used_memory_percent}%</b> из <b>{memory_device['MemTotal'] / (1024 * 1024):.2f}</b> Гб\n"
             device_info_msg = device_info_msg + memory_msg
             # Расчитываем процент загрузки свопа
-            used_swap_percent = round((memory_device['SwapTotal'] - memory_device['SwapFree']) * 100 / memory_device['MemTotal'])
+            used_swap_percent = round((memory_device['SwapTotal'] - memory_device['SwapFree']) * 100 / memory_device['SwapTotal'])
             swap_msg = f"Cвоп: занято <b>{used_swap_percent}%</b> из <b>{memory_device['SwapTotal'] / (1024 * 1024):.2f}</b> Гб\n"
             device_info_msg = device_info_msg + swap_msg 
 
@@ -527,7 +529,7 @@ async def start_handler(msg: Message):
             cmd = RUN_AUTUSSH_CMD,
             stdout = asyncio.subprocess.DEVNULL            
         )
-
+        await proc.communicate()
         # Сообщение о запуске клиента ssh
         await msg.answer(AUTO_SSH_START_MSG)            
 
