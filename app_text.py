@@ -7,6 +7,9 @@ LINK_ON_MSG = 'Включаем связь с сетью <b>МИС "Барс"</b
 STATUS_ANSWER_MSG = 'Считываем данные о параметрах точки доступа к <b>МИС "Барс"</b>.'
 AFTER_REBOOT_MSG = 'Бот на устройстве <b><I><u>Бегемотик</u></I></b> запущен.'
 AFTER_POWER_ON_OFF_MSG = 'Устройство запущено после <b>включения/выключения</b> питания. Возможны коллизии при работе! ' + '\U0001F198'
+AUTO_SSH_FOUND_MSG = 'Процесс <b>AUTOSSH</b> найден.'
+AUTO_SSH_NO_FOUND_MSG = 'Процесс <b>AUTOSSH</b> не найден.'
+AUTO_SSH_START_MSG = 'Процесс <b>AUTOSSH</b> запущен/перезапущен.'
 
 
 NO_TEMP_FOUND = "Температура: <I>нет данных</I>"
@@ -43,6 +46,14 @@ OS_RELEASE_INFO = ['lsb_release', '-a']
 OS_DF_INFO = ['df', '-h']
 # Команда на создание файла-маяка, сигнализирующего о первом запуске платы
 OS_SEMAPHOR_CREATE = 'touch /tmp/orange.tmp'
+
+# Команда на поиск запущенного экземпляра процесса autossh
+SEARCH_AUTUSSH_CMD = 'pidof autossh'
+
+# Команда на запуск autossh с параметрами
+# параметры ssh см. в файле ~/.ssh/config
+RUN_AUTUSSH_CMD = 'autossh -M 0 -f -N bars-gw'
+
 
 
 
