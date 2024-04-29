@@ -6,6 +6,7 @@ Description=Service for ping wifi-router gateway
 Unit=ping_gw.service
 OnBootSec=600
 OnUnitActiveSec=600
+AccuracySec=1m
 
 [Install]
 WantedBy=multi-user.target
