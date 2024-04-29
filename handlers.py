@@ -510,7 +510,7 @@ async def start_handler(msg: Message):
             stdout = asyncio.subprocess.PIPE,
             stderr = asyncio.subprocess.PIPE
         )
-        # stderr - остваил жля примера
+        # stderr - оставил для примера
         stdout, stderr = await proc.communicate()
 
         if proc.returncode == 0:
