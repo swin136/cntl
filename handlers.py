@@ -500,7 +500,7 @@ async def start_handler(msg: Message):
         # создаем задачу по удалению исходного сообщения с командой
         asyncio.create_task(delete_message(msg, TIME_DELETE))
 
-
+# Обработчик для ЗАПУСКА/ПЕРЕЗАПУСКА ssh-клиента (в обертке c AutoSSH)
 @router.message(Command("ssh_restart"))
 async def start_handler(msg: Message):
     if msg.from_user.id in USER_TLG_IDS:
@@ -510,6 +510,7 @@ async def start_handler(msg: Message):
             stdout = asyncio.subprocess.PIPE,
             stderr = asyncio.subprocess.PIPE
         )
+        # stderr - остваил жля примера
         stdout, stderr = await proc.communicate()
 
         if proc.returncode == 0:
@@ -519,7 +520,7 @@ async def start_handler(msg: Message):
             cmd = f'kill {pid_autossh}',
             stdout = asyncio.subprocess.DEVNULL            
         )
-            data = await proc.communicate()
+            await proc.communicate()
         else:
             # Экземпляр процесса autossh не найден
             await msg.answer(AUTO_SSH_NO_FOUND_MSG)
@@ -535,4 +536,3 @@ async def start_handler(msg: Message):
 
         # создаем задачу по удалению исходного сообщения с командой
         asyncio.create_task(delete_message(msg, TIME_DELETE))
-# SEARCH_AUTUSSH_CMD, RUN_AUTUSSH_CMD, AUTO_SSH_FOUND_MSG, AUTO_SSH_NO_FOUND_MSG, AUTO_SSH_START_MSG 
