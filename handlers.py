@@ -24,6 +24,7 @@ from app_text import OS_RELEASE_INFO, OS_RELEASE_INFO, SHOW_CPU_INFO, KERNEL_VER
 from app_text import OS_DF_INFO, ERROR_DEVICE_GET_DATA  
 from app_text import STATUS_BUTTON, HELP_BUTTON, CONNECT_TO_BARS, DISCONNET_FROM_BARS
 from app_text import SOURCE_WEB_SERVER_URL
+from app_text import SEARCH_AUTUSSH_CMD, RUN_AUTUSSH_CMD, AUTO_SSH_FOUND_MSG, AUTO_SSH_NO_FOUND_MSG, AUTO_SSH_START_MSG  
 
 from kb import keyboard
 
@@ -267,6 +268,7 @@ async def start_handler(msg: Message):
         help_msg = "Команды бота помощника:\n<b>/reboot</b> - <b><u>перегрузить устройство </u></b>" + "\U0001F198" + "\n"
         help_msg = help_msg + "<b>/status</b> - получить статус устройства\n"
         help_msg = help_msg + "<b>/linkon</b> - подключиться к МИС 'Барс'\n<b>/linkoff</b> - отключиться от МИС 'Барс'\n"
+        help_msg = help_msg + "<b>/ssh_restart</b> - запуск/перезапуск SSH-клиента\n"
         help_msg = help_msg + '<b>/addr</b> - данные по сетевым адресам устройства\n'
         help_msg = help_msg + '<b>/route</b> - таблица маршрутизации устройства\n'
         help_msg = help_msg + '<b>/lastip</b> - последний полученный ip-адрес по DHCP\n'
@@ -495,3 +497,40 @@ async def start_handler(msg: Message):
        
         # создаем задачу по удалению исходного сообщения с командой
         asyncio.create_task(delete_message(msg, TIME_DELETE))
+
+
+@router.message(Command("ssh_restart"))
+async def start_handler(msg: Message):
+    if msg.from_user.id in USER_TLG_IDS:
+        # Ищем запущенный экземпляр процесса autossh
+        proc = await asyncio.create_subprocess_shell(
+            cmd = SEARCH_AUTUSSH_CMD,
+            stdout = asyncio.subprocess.PIPE,
+            stderr = asyncio.subprocess.PIPE
+        )
+        stdout, stderr = await proc.communicate()
+
+        if proc.returncode == 0:
+            pid_autossh = int(stdout.decode())
+            await msg.answer(AUTO_SSH_FOUND_MSG)
+            proc = await asyncio.create_subprocess_shell(
+            cmd = f'kill {pid_autossh}',
+            stdout = asyncio.subprocess.DEVNULL            
+        )
+            data = await proc.communicate()
+        else:
+            # Экземпляр процесса autossh не найден
+            await msg.answer(AUTO_SSH_NO_FOUND_MSG)
+
+        await asyncio.sleep(10)
+        proc = await asyncio.create_subprocess_shell(
+            cmd = RUN_AUTUSSH_CMD,
+            stdout = asyncio.subprocess.DEVNULL            
+        )
+
+        # Сообщение о запуске клиента ssh
+        await msg.answer(AUTO_SSH_START_MSG)            
+
+        # создаем задачу по удалению исходного сообщения с командой
+        asyncio.create_task(delete_message(msg, TIME_DELETE))
+# SEARCH_AUTUSSH_CMD, RUN_AUTUSSH_CMD, AUTO_SSH_FOUND_MSG, AUTO_SSH_NO_FOUND_MSG, AUTO_SSH_START_MSG 
