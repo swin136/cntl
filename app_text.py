@@ -52,7 +52,7 @@ SEARCH_AUTUSSH_CMD = 'pidof autossh'
 
 # Команда на запуск autossh с параметрами
 # параметры ssh см. в файле ~/.ssh/config
-RUN_AUTUSSH_CMD = 'autossh -M 0 -f -N bars-gw'
+RUN_AUTUSSH_CMD = 'autossh -M 0 -f -N bars-gw &'
 
 
 
