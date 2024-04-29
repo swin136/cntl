@@ -11,8 +11,11 @@ TEMPLATE = '% packet loss'
 LEVEL_ERROR = 80
 TIME_KOEFF = 2 
 
+# Файлы логов
 LOG_FILE = '/tmp/ping.log'
 ERROR_FILE = '/tmp/ping.err'
+
+DEBUG_MODE = False
 
 async def main():
     cmd_ping = f'ping -4 -c {PACKET_COUNT} {TARGET}'
@@ -33,9 +36,9 @@ async def main():
         if process.returncode == 0:
             result_txt = str(stdout.decode()).strip().split("\n")
             stat_str = ""
-            # pprint.pprint(result_txt)
             for item in reversed(result_txt):
-                # print(item)
+                if DEBUG_MODE:
+                    print(item)
                 if TEMPLATE in item:
                     stat_str = item
                     break
@@ -43,17 +46,22 @@ async def main():
                 raise ValueError
             total_list = stat_str.split(',')
             #['5 packets transmitted', ' 5 received', ' 0% packet loss', ' time 4008ms']
-            # print(total_list)
+            if DEBUG_MODE:
+                print(total_list)
             error_str = total_list[2]
             error = math.floor(float(error_str[:error_str.find(TEMPLATE)]))
-            # print(f'Процент потерянных пакетов - {error}')
+            
+            if DEBUG_MODE:
+                print(f'Процент потерянных пакетов - {error}')
 
             if error >= LEVEL_ERROR:
                 raise ValueError 
 
             time_str = total_list[3].split()[1]
             time_total_ms = int(time_str[:time_str.find('ms')])
-            # print(f'Затраченное время (мс) - {time_total_ms}')
+
+            if DEBUG_MODE:
+                print(f'Затраченное время (мс) - {time_total_ms}')
 
             if time_total_ms > PACKET_COUNT * TIME_KOEFF * 1_000:
                 raise ValueError
@@ -67,7 +75,8 @@ async def main():
             raise ValueError
             
     except (ValueError, IndexError):
-        # print('Ошибка при проверке')
+        if DEBUG_MODE:
+            print('Ошибка при проверке')
         # Пишем лог об ошибке
         async with aiofiles.open(ERROR_FILE, mode='a') as log_file:
             await log_file.write(f"{datetime.datetime.now().strftime('%d-%m-%Y %H:%M:%S')} \n") 
