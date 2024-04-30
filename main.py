@@ -9,6 +9,7 @@ from aiogram.client.bot import DefaultBotProperties
 from aiogram.exceptions import TelegramBadRequest
 
 from handlers import router
+from handlers import shutdown_handler
 
 from config import BOT_TOKEN
 from config import USER_TLG_IDS
@@ -40,6 +41,7 @@ async def main():
         
     dp = Dispatcher(storage=MemoryStorage())
     dp.include_router(router)
+    dp.shutdown.register(shutdown_handler)
     await bot.delete_webhook(drop_pending_updates=True)
     await dp.start_polling(bot, allowed_updates=dp.resolve_used_update_types())
     
