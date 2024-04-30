@@ -76,10 +76,13 @@ GATEWAY_LOG_FILE = '/home/orangepi/route.log'
 KERNEL_VERSION_FILE = '/proc/version'
 # файл для получения имени хоста
 HOSTNAME_FILE = '/proc/sys/kernel/hostname'
+# файл для получения инфорации о релизе платы
+RELEASE_BOARD_FILE = '/etc/orangepi-release'
 
 # файл-якорь первого включения
 FIRST_LAUNCH_FILE = '/tmp/orange.tmp'
 
 # URL_WEB_Server
 SOURCE_WEB_SERVER_URL = 'http://192.168.1.1'
+
 
