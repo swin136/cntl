@@ -25,6 +25,10 @@ from app_text import OS_DF_INFO, ERROR_DEVICE_GET_DATA
 from app_text import STATUS_BUTTON, HELP_BUTTON, CONNECT_TO_BARS, DISCONNET_FROM_BARS
 from app_text import SOURCE_WEB_SERVER_URL
 from app_text import SEARCH_AUTUSSH_CMD, RUN_AUTUSSH_CMD, AUTO_SSH_FOUND_MSG, AUTO_SSH_NO_FOUND_MSG, AUTO_SSH_START_MSG  
+from app_text import TEST_NETWORK_HOSTS
+from app_text import START_NETWORK_TEST_MSG 
+
+from app_utils import ping_host
 
 from kb import keyboard
 
@@ -177,7 +181,9 @@ async def change_net_interfase(cmd_to_change: str, msg: Message):
     Функция изменяет состояние сетевого интерфейса (включат/выключает его)
     """
     # Отправляем команду на изменение проводного интерфейса
-    process = await asyncio.create_subprocess_shell(cmd_to_change)
+    process = await asyncio.create_subprocess_shell(cmd_to_change, 
+                                                    stdout=asyncio.subprocess.DEVNULL,
+                                                    stderr=asyncio.subprocess.DEVNULL)
     await process.communicate()
     # Пауза - может убрать её ?????
     await asyncio.sleep(2)
@@ -192,10 +198,10 @@ async def change_net_interfase(cmd_to_change: str, msg: Message):
      # Считываем параметры проводного интерфейса
     try:
         async with aiofiles.open(NET_DEVICE_CARRIER_FILE, mode='r') as linux_file:
-            contents = await linux_file.read()
-            net_device_status_msg = 'Подключение к сети <I>МИС "БАРС"</I> : <b>АКТИВНО</b>'  #'\U000026A0'
-            # Подключение активно - взводим флаг проверки доступа к веб-серверу
-            must_access__web_server = True
+            await linux_file.read()
+        net_device_status_msg = 'Подключение к сети <I>МИС "БАРС"</I> : <b>АКТИВНО</b>'  #'\U000026A0'
+        # Подключение активно - взводим флаг проверки доступа к веб-серверу
+        must_access__web_server = True
     except (FileNotFoundError, OSError):
         net_device_status_msg = 'Подключение к сети <I>МИС "БАРС"</I> : <b>ОТКЛЮЧЕНО </b>' + '\U0001F198'
     
@@ -271,6 +277,7 @@ async def start_handler(msg: Message):
         help_msg = help_msg + "<b>/status</b> - получить статус устройства\n"
         help_msg = help_msg + "<b>/linkon</b> - подключиться к МИС 'Барс'\n<b>/linkoff</b> - отключиться от МИС 'Барс'\n"
         help_msg = help_msg + "<b>/ssh_restart</b> - запуск/перезапуск SSH-клиента\n"
+        help_msg = help_msg + "<b>/net_test</b> - тест Интернет соединения\n" 
         help_msg = help_msg + '<b>/addr</b> - данные по сетевым адресам устройства\n'
         help_msg = help_msg + '<b>/route</b> - таблица маршрутизации устройства\n'
         help_msg = help_msg + '<b>/lastip</b> - последний полученный ip-адрес по DHCP\n'
@@ -553,5 +560,25 @@ async def start_handler(msg: Message):
         # Сообщение о запуске клиента ssh
         await msg.answer(AUTO_SSH_START_MSG)            
 
+        # создаем задачу по удалению исходного сообщения с командой
+        asyncio.create_task(delete_message(msg, TIME_DELETE))
+
+
+@router.message(Command("net_test"))
+async def start_handler(msg: Message):
+    if msg.from_user.id in USER_TLG_IDS:
+        await msg.answer(START_NETWORK_TEST_MSG)
+        for host in TEST_NETWORK_HOSTS.keys():
+            result = await ping_host(host)
+            if result['return_code'] == 0:
+                info_msg = f'{TEST_NETWORK_HOSTS[host]} ({host}) <b>доступен</b>.' + ' \U00002705\n'
+                info_msg = info_msg + f"Cреднее время пингования узла - {result['avarage_time']} мс.\n"
+                info_msg = info_msg + f"{result['persent_loss']}% процентов пакетов потеряно."
+                
+                await msg.answer(info_msg)
+            else:
+                await msg.answer(f'{TEST_NETWORK_HOSTS[host]} ({host}) <b>недоступен</b>.' + ' \U0001F198')
+        # Информационной сообщение пользователю бота
+        await msg.answer('<u>Успешной работы!</u>')
         # создаем задачу по удалению исходного сообщения с командой
         asyncio.create_task(delete_message(msg, TIME_DELETE))
