@@ -572,8 +572,8 @@ async def start_handler(msg: Message):
             result = await ping_host(host)
             if result['return_code'] == 0:
                 info_msg = f'{TEST_NETWORK_HOSTS[host]} ({host}) <b>доступен</b>.' + ' \U00002705\n'
-                info_msg = info_msg + f"Cреднее время пингования узла - {result['avarage_time']} мс.\n"
-                info_msg = info_msg + f"{result['persent_loss']}% процентов пакетов потеряно."
+                info_msg = info_msg + f"Cреднее время пингования узла - <b>{result['avarage_time']}</b> мс.\n"
+                info_msg = info_msg + f"<b>{result['persent_loss']}%</b> процентов пакетов потеряно."
                 
                 await msg.answer(info_msg)
             else:
