@@ -20,7 +20,7 @@ from app_text import SYSTEM_REBOOT_CMD
 from app_text import HELLO_MSG, REBOOT_MSG, STATUS_ANSWER_MSG, MEM_INFO_FILE, THERMAL_FILE, UPTIME_INFO_FILE 
 from app_text import NO_TEMP_FOUND, NET_DEVICE_CARRIER_FILE, SYSTEM_DOWN_NETWORK_CMD, LINK_OFF_MSG, LINK_ON_MSG, SYSTEM_UP_NETWORK_CMD 
 from app_text import RESTORE_ROUTE, NO_INTERFACE_DATA, IP_LOG_FILE, ERROR_IP_LOG, GATEWAY_LOG_FILE 
-from app_text import OS_RELEASE_INFO, OS_RELEASE_INFO, SHOW_CPU_INFO, KERNEL_VERSION_FILE, HOSTNAME_FILE
+from app_text import OS_RELEASE_INFO, OS_RELEASE_INFO, SHOW_CPU_INFO, KERNEL_VERSION_FILE, HOSTNAME_FILE, RELEASE_BOARD_FILE 
 from app_text import OS_DF_INFO, ERROR_DEVICE_GET_DATA  
 from app_text import STATUS_BUTTON, HELP_BUTTON, CONNECT_TO_BARS, DISCONNET_FROM_BARS
 from app_text import SOURCE_WEB_SERVER_URL
@@ -382,6 +382,25 @@ async def start_handler(msg: Message):
 
             device_info_msg =  device_info_msg + system_timing_msg    
 
+            # Информация о релизе платы
+            async with aiofiles.open(RELEASE_BOARD_FILE, mode='r') as linux_file:
+                async for line in linux_file:
+                    parms_list = line.strip().split("=")
+                    if parms_list[0] == 'BOARD_NAME':
+                        board_name = parms_list[1]
+                        continue
+                    elif parms_list[0] == 'VERSION':
+                        verion_board =  parms_list[1]
+                        continue
+                    elif parms_list[0] == 'ARCH':                        
+                        arch_board =  parms_list[1]
+                        continue                        
+                
+            device_info_msg =  device_info_msg + f'Имя платы: <b>{board_name}</b>\n'
+            device_info_msg =  device_info_msg + f'Версия платы: <b>{verion_board}</b>\n'
+            device_info_msg =  device_info_msg + f"Архитектура: <b>{arch_board.upper()}</b>\n"
+
+
             # Считываем информацию о процессоре - команда lscpu
             result = subprocess.run([SHOW_CPU_INFO], stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
             cpu_info = result.stdout.strip().split("\n")
@@ -407,8 +426,8 @@ async def start_handler(msg: Message):
                 if test_line[0].strip().lower() == 'CPU max MHz'.lower():
                         max_cpu_freq = f"Максимальная частота: <b>{test_line[1].strip().split(',')[0]} МГц</b>\n"
                         continue
-            device_info_msg =  device_info_msg + arch_type + model_name +  max_cpu_freq 
-            device_info_msg = device_info_msg + min_cpu_freq + cpu_core_count
+            device_info_msg =  device_info_msg + model_name + arch_type +  min_cpu_freq 
+            device_info_msg = device_info_msg + max_cpu_freq + cpu_core_count
 
             # считываем релиз опреационной системы
             result = subprocess.run(OS_RELEASE_INFO, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
@@ -431,7 +450,7 @@ async def start_handler(msg: Message):
             memory_device = {}
             async with aiofiles.open(MEM_INFO_FILE, mode='r') as linux_file:
                 async for line in linux_file:
-                    contents.append(line)
+                    # contents.append(line)
                     record = line.strip().split(':')
                     if record[0] == "MemTotal":
                         memory_device['MemTotal'] = int(record[1].strip()[:-2].strip())
@@ -493,7 +512,7 @@ async def start_handler(msg: Message):
             device_info_msg = device_info_msg + log_usage_msg
 
             await msg.answer(device_info_msg)            
-        except (UnboundLocalError, IndexError) as _exp:
+        except (UnboundLocalError, IndexError, FileNotFoundError) as _exp:
             # await msg.answer(str(_exp))
             await msg.answer(ERROR_DEVICE_GET_DATA)
        
