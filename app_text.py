@@ -10,6 +10,7 @@ AFTER_POWER_ON_OFF_MSG = 'Устройство запущено после <b>в
 AUTO_SSH_FOUND_MSG = 'Процесс <b>AUTOSSH</b> найден.'
 AUTO_SSH_NO_FOUND_MSG = 'Процесс <b>AUTOSSH</b> не найден.'
 AUTO_SSH_START_MSG = 'Процесс <b>AUTOSSH</b> запущен/перезапущен.'
+START_NETWORK_TEST_MSG = '<b>Начало тестирования доступа к Интернет-ресурсам ...</b>.'
 
 
 NO_TEMP_FOUND = "Температура: <I>нет данных</I>"
@@ -55,9 +56,7 @@ SEARCH_AUTUSSH_CMD = 'pidof autossh'
 RUN_AUTUSSH_CMD = 'autossh -M 0 -f -N bars-gw &'
 
 
-
-
-# Имена фалов из каталога /proc для получения данных о системе
+# Имена файлов из каталога /proc для получения данных о системе
 # Использование памяти
 MEM_INFO_FILE = '/proc/meminfo'
 # Температура платы
@@ -85,4 +84,11 @@ FIRST_LAUNCH_FILE = '/tmp/orange.tmp'
 # URL_WEB_Server
 SOURCE_WEB_SERVER_URL = 'http://192.168.1.1'
 
+# Узлы для проверки работоспособности сети
+TEST_NETWORK_HOSTS = {
+    '192.168.43.1' : "Шлюз сети Wi-Fi",
+    'lombard-alania.ru' : 'Сервер для работы SSH-туннелей устройства',
+    'beeline.ru' : 'Сервер провайдера,
+    '8.8.4.4.': 'DNS-сервер Google',
+}
 
