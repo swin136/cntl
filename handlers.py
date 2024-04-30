@@ -1,4 +1,4 @@
-from aiogram import types, F, Router
+from aiogram import types, F, Router, Bot
 from aiogram.types import Message
 from aiogram.filters import Command
 from aiogram.exceptions import TelegramBadRequest
@@ -26,7 +26,7 @@ from app_text import STATUS_BUTTON, HELP_BUTTON, CONNECT_TO_BARS, DISCONNET_FROM
 from app_text import SOURCE_WEB_SERVER_URL
 from app_text import SEARCH_AUTUSSH_CMD, RUN_AUTUSSH_CMD, AUTO_SSH_FOUND_MSG, AUTO_SSH_NO_FOUND_MSG, AUTO_SSH_START_MSG  
 from app_text import TEST_NETWORK_HOSTS
-from app_text import START_NETWORK_TEST_MSG 
+from app_text import START_NETWORK_TEST_MSG, STOP_BOT_MSG  
 
 from app_utils import ping_host
 
@@ -582,3 +582,11 @@ async def start_handler(msg: Message):
         await msg.answer('<u>Успешной работы!</u>')
         # создаем задачу по удалению исходного сообщения с командой
         asyncio.create_task(delete_message(msg, TIME_DELETE))
+
+
+async def shutdown_handler(bot: Bot):
+    for item in USER_TLG_IDS:
+        try:
+            await bot.send_message(item, STOP_BOT_MSG)
+        except TelegramBadRequest:
+            continue
