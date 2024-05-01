@@ -1,4 +1,5 @@
 .venv
 config.py
+config.txt
 __pycache__
 test.py
