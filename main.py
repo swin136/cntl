@@ -11,8 +11,8 @@ from aiogram.exceptions import TelegramBadRequest
 from handlers import router
 from handlers import shutdown_handler
 
-from config import BOT_TOKEN
-from config import USER_TLG_IDS
+
+from config_settings import bot_settings
 
 from app_text import AFTER_REBOOT_MSG, AFTER_POWER_ON_OFF_MSG
 from app_text import OS_SEMAPHOR_CREATE, FIRST_LAUNCH_FILE 
@@ -21,7 +21,7 @@ from app_text import OS_SEMAPHOR_CREATE, FIRST_LAUNCH_FILE
 async def main():
     # старая версия - на эту строчку вываливается Warning
     # bot = Bot(token=BOT_TOKEN, parse_mode=ParseMode.HTML)
-    bot = Bot(token=BOT_TOKEN, default=DefaultBotProperties(parse_mode=ParseMode.HTML))
+    bot = Bot(token=bot_settings.bots.bot_token, default=DefaultBotProperties(parse_mode=ParseMode.HTML))
     # Работа с файлом-семафором
     first_run = True
     if not os.path.isfile(FIRST_LAUNCH_FILE):
@@ -30,7 +30,7 @@ async def main():
         first_run = False
 
     # Отправляем приветсвенное сообщение о начале работы бота
-    for item in USER_TLG_IDS:
+    for item in bot_settings.bots.user_ids:
         try:
             await bot.send_message(item, AFTER_REBOOT_MSG)
             if not first_run:
