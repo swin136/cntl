@@ -277,7 +277,7 @@ async def start_handler(msg: Message):
         help_msg = help_msg + "<b>/status</b> - получить статус устройства\n"
         help_msg = help_msg + "<b>/linkon</b> - подключиться к МИС 'Барс'\n<b>/linkoff</b> - отключиться от МИС 'Барс'\n"
         help_msg = help_msg + "<b>/ssh_restart</b> - запуск/перезапуск SSH-клиента\n"
-        help_msg = help_msg + "<b>/net_test</b> - тест Интернет соединения\n" 
+        help_msg = help_msg + "<b>/net_test</b> - тест соединения с Интернетом\n" 
         help_msg = help_msg + '<b>/addr</b> - данные по сетевым адресам устройства\n'
         help_msg = help_msg + '<b>/route</b> - таблица маршрутизации устройства\n'
         help_msg = help_msg + '<b>/lastip</b> - последний полученный ip-адрес по DHCP\n'
@@ -571,9 +571,9 @@ async def start_handler(msg: Message):
         for host in TEST_NETWORK_HOSTS.keys():
             result = await ping_host(host)
             if result['return_code'] == 0:
-                info_msg = f'{TEST_NETWORK_HOSTS[host]} ({host}) <b>доступен</b>.' + ' \U00002705\n'
+                info_msg = f'{TEST_NETWORK_HOSTS[host]} ({host}) <b>доступен</b>' + ' \U00002705\n'
                 info_msg = info_msg + f"Cреднее время пингования узла - <b>{result['avarage_time']}</b> мс.\n"
-                info_msg = info_msg + f"<b>{result['persent_loss']}%</b> процентов пакетов потеряно."
+                info_msg = info_msg + f"Потери ICMP-пакетов: <b>{result['persent_loss']}%</b>"
                 
                 await msg.answer(info_msg)
             else:
