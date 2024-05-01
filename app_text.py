@@ -88,7 +88,7 @@ SOURCE_WEB_SERVER_URL = 'http://192.168.1.1'
 # Узлы для проверки работоспособности сети
 TEST_NETWORK_HOSTS = {
     '192.168.43.1' : "Шлюз сети Wi-Fi",
-    'lombard-alania.ru' : 'Сервер SSH-туннелей устройства',
+    'lombard-alania.ru' : 'Сервер SSH-туннелей',
     'beeline.ru' : 'Сервер провайдера',
     '8.8.4.4.': 'DNS-сервер Google',
 }
