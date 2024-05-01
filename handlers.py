@@ -64,7 +64,9 @@ async def delete_message(message: types.Message, second: int = 0):
 async def start_handler(msg: Message):
     if msg.from_user.id in USER_TLG_IDS:
         # await msg.answer(HELLO_MSG)
-        await msg.answer(HELLO_MSG, reply_markup=keyboard)
+        await msg.answer(f"Привет, <b>{msg.from_user.first_name}</b>! {HELLO_MSG}", reply_markup=keyboard)
+        # создаем задачу по удалению исходного сообщение
+        asyncio.create_task(delete_message(msg, TIME_DELETE))
         
 
 @router.message(Command("status"))
