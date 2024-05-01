@@ -5,7 +5,7 @@ from aiogram.exceptions import TelegramBadRequest
 
 import aiohttp.client_exceptions
 
-from config import USER_TLG_IDS
+from config_settings import bot_settings
 
 import os
 import subprocess
@@ -62,7 +62,7 @@ async def delete_message(message: types.Message, second: int = 0):
 
 @router.message(Command("start"))
 async def start_handler(msg: Message):
-    if msg.from_user.id in USER_TLG_IDS:
+    if msg.from_user.id in bot_settings.bots.user_ids:
         # await msg.answer(HELLO_MSG)
         await msg.answer(f"Привет, <b>{msg.from_user.first_name}</b>! {HELLO_MSG}", reply_markup=keyboard)
         # создаем задачу по удалению исходного сообщение
@@ -72,7 +72,7 @@ async def start_handler(msg: Message):
 @router.message(Command("status"))
 @router.message(F.text.lower() == STATUS_BUTTON.lower())
 async def start_handler(msg: Message):
-    if msg.from_user.id in USER_TLG_IDS:
+    if msg.from_user.id in bot_settings.bots.user_ids:
         await msg.answer(STATUS_ANSWER_MSG)
         await asyncio.sleep(APP_DELAY)
         # Получаем данные о расходовании памяти
@@ -229,7 +229,7 @@ async def change_net_interfase(cmd_to_change: str, msg: Message):
 @router.message(Command("linkoff"))
 @router.message(F.text.lower() == DISCONNET_FROM_BARS.lower())
 async def start_handler(msg: Message):
-    if msg.from_user.id in USER_TLG_IDS:
+    if msg.from_user.id in bot_settings.bots.user_ids:
         # отправляем сообщению пользователе о начале операции по отключению 
         # сетевого интерфейса
         await msg.answer(LINK_OFF_MSG)
@@ -244,7 +244,7 @@ async def start_handler(msg: Message):
 @router.message(Command("linkon"))
 @router.message(F.text.lower() == CONNECT_TO_BARS.lower())
 async def start_handler(msg: Message):
-    if msg.from_user.id in USER_TLG_IDS:
+    if msg.from_user.id in bot_settings.bots.user_ids:
         # отправляем сообщению пользователе о начале операции по включению 
         # сетевого интерфейса
         await msg.answer(LINK_ON_MSG)
@@ -258,8 +258,8 @@ async def start_handler(msg: Message):
 # Отправляем команду на перезагрузку
 @router.message(Command("reboot"))
 async def start_handler(msg: Message):
-    if msg.from_user.id in USER_TLG_IDS:
-        for item in USER_TLG_IDS:
+    if msg.from_user.id in bot_settings.bots.user_ids:
+        for item in user_tlg_ids:
             try:
                 await msg.bot.send_message(item, REBOOT_MSG)
             except TelegramBadRequest:
@@ -274,7 +274,7 @@ async def start_handler(msg: Message):
 @router.message(Command("help"))
 @router.message(F.text.lower() == HELP_BUTTON.lower())
 async def start_handler(msg: Message):
-    if msg.from_user.id in USER_TLG_IDS:
+    if msg.from_user.id in bot_settings.bots.user_ids:
         help_msg = "Команды бота помощника:\n<b>/reboot</b> - <b><u>перегрузить устройство </u></b>" + "\U0001F198" + "\n"
         help_msg = help_msg + "<b>/status</b> - получить статус устройства\n"
         help_msg = help_msg + "<b>/linkon</b> - подключиться к <tg-spoiler>МИС 'Барс'</tg-spoiler>\n<b>/linkoff</b> - отключиться от <tg-spoiler>МИС 'Барс'</tg-spoiler>\n"
@@ -293,7 +293,7 @@ async def start_handler(msg: Message):
 @router.message(Command("addr"))
 async def start_handler(msg: Message):
     show_interface_cmd = '/sbin/ifconfig'
-    if msg.from_user.id in USER_TLG_IDS:
+    if msg.from_user.id in bot_settings.bots.user_ids:
         interfaces = {'eth0': '', 
                       'wlan0': '',
                       }
@@ -314,7 +314,7 @@ async def start_handler(msg: Message):
 # Выводим сведения о маршрутизации устройства
 @router.message(Command("route"))
 async def start_handler(msg: Message):
-    if msg.from_user.id in USER_TLG_IDS:
+    if msg.from_user.id in bot_settings.bots.user_ids:
         result = subprocess.run(['/sbin/ip', 'r'], stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
         route_msg = "<b>Таблица маршрутизации устройства:</b>\n"+result.stdout.strip()
         await msg.answer(route_msg)
@@ -326,7 +326,7 @@ async def start_handler(msg: Message):
 # проводным интефейсом через DHCP
 @router.message(Command("lastip"))
 async def start_handler(msg: Message):
-    if msg.from_user.id in USER_TLG_IDS:
+    if msg.from_user.id in bot_settings.bots.user_ids:
             try:
                 # Считываем данные о сетевых интерфейсах
                 contents = []
@@ -363,7 +363,7 @@ async def start_handler(msg: Message):
 # UnboundLocalError
 @router.message(Command("info"))
 async def start_handler(msg: Message):
-    if msg.from_user.id in USER_TLG_IDS:
+    if msg.from_user.id in bot_settings.bots.user_ids:
         device_info_msg = "<b>Сведения об устройстве</b>:\n"
         # Считываем информацию оБ имени машины
         async with aiofiles.open(HOSTNAME_FILE, mode='r') as linux_file:
@@ -531,7 +531,7 @@ async def start_handler(msg: Message):
 # Обработчик для ЗАПУСКА/ПЕРЕЗАПУСКА ssh-клиента (в обертке c AutoSSH)
 @router.message(Command("ssh_restart"))
 async def start_handler(msg: Message):
-    if msg.from_user.id in USER_TLG_IDS:
+    if msg.from_user.id in bot_settings.bots.user_ids:
         # Ищем запущенный экземпляр процесса autossh
         proc = await asyncio.create_subprocess_shell(
             cmd = SEARCH_AUTUSSH_CMD,
@@ -568,7 +568,7 @@ async def start_handler(msg: Message):
 
 @router.message(Command("net_test"))
 async def start_handler(msg: Message):
-    if msg.from_user.id in USER_TLG_IDS:
+    if msg.from_user.id in bot_settings.bots.user_ids:
         await msg.answer(START_NETWORK_TEST_MSG)
         for host in TEST_NETWORK_HOSTS.keys():
             result = await ping_host(host)
@@ -587,7 +587,7 @@ async def start_handler(msg: Message):
 
 
 async def shutdown_handler(bot: Bot):
-    for item in USER_TLG_IDS:
+    for item in bot_settings.bots.user_ids:
         try:
             await bot.send_message(item, STOP_BOT_MSG)
         except TelegramBadRequest:
