@@ -259,7 +259,7 @@ async def start_handler(msg: Message):
 @router.message(Command("reboot"))
 async def start_handler(msg: Message):
     if msg.from_user.id in bot_settings.bots.user_ids:
-        for item in user_tlg_ids:
+        for item in bot_settings.bots.user_ids:
             try:
                 await msg.bot.send_message(item, REBOOT_MSG)
             except TelegramBadRequest:
