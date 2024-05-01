@@ -277,7 +277,7 @@ async def start_handler(msg: Message):
     if msg.from_user.id in USER_TLG_IDS:
         help_msg = "Команды бота помощника:\n<b>/reboot</b> - <b><u>перегрузить устройство </u></b>" + "\U0001F198" + "\n"
         help_msg = help_msg + "<b>/status</b> - получить статус устройства\n"
-        help_msg = help_msg + "<b>/linkon</b> - подключиться к МИС 'Барс'\n<b>/linkoff</b> - отключиться от МИС 'Барс'\n"
+        help_msg = help_msg + "<b>/linkon</b> - подключиться к <tg-spoiler>МИС 'Барс'</tg-spoiler>\n<b>/linkoff</b> - отключиться от <tg-spoiler>МИС 'Барс'</tg-spoiler>\n"
         help_msg = help_msg + "<b>/ssh_restart</b> - запуск/перезапуск SSH-клиента\n"
         help_msg = help_msg + "<b>/net_test</b> - тест соединения с Интернетом\n" 
         help_msg = help_msg + '<b>/addr</b> - данные по сетевым адресам устройства\n'
