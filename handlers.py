@@ -573,7 +573,7 @@ async def start_handler(msg: Message):
         for host in TEST_NETWORK_HOSTS.keys():
             result = await ping_host(host)
             if result['return_code'] == 0:
-                info_msg = f'{TEST_NETWORK_HOSTS[host]} ({host}) <b>доступен</b>' + ' \U00002705\n'
+                info_msg = f'{TEST_NETWORK_HOSTS[host]} <tg-spoiler>{host}</tg-spoiler> <b>доступен</b>' + ' \U00002705\n'
                 info_msg = info_msg + f"Cреднее время пингования узла - <b>{result['avarage_time']}</b> мс.\n"
                 info_msg = info_msg + f"Потери ICMP-пакетов: <b>{result['persent_loss']}%</b>"
                 
