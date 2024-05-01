@@ -174,7 +174,7 @@ async def start_handler(msg: Message):
 
 
         # Информационной сообщение пользователю бота
-        await msg.answer('Успешной работы!')
+        await msg.answer(f'Успешной работы, <b><u>{msg.from_user.first_name}</u></b>!')
         # создаем задачу по удалению исходного сообщение
         asyncio.create_task(delete_message(msg, TIME_DELETE))
 
