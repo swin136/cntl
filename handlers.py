@@ -27,6 +27,8 @@ from app_text import SOURCE_WEB_SERVER_URL
 from app_text import SEARCH_AUTUSSH_CMD, RUN_AUTUSSH_CMD, AUTO_SSH_FOUND_MSG, AUTO_SSH_NO_FOUND_MSG, AUTO_SSH_START_MSG  
 from app_text import TEST_NETWORK_HOSTS
 from app_text import START_NETWORK_TEST_MSG, STOP_BOT_MSG  
+from app_text import OS_SEMAPHOR_CREATE, FIRST_LAUNCH_FILE 
+from app_text import AFTER_REBOOT_MSG, AFTER_POWER_ON_OFF_MSG
 
 from app_utils import ping_host
 
@@ -585,10 +587,30 @@ async def start_handler(msg: Message):
         # создаем задачу по удалению исходного сообщения с командой
         asyncio.create_task(delete_message(msg, TIME_DELETE))
 
-
-async def shutdown_handler(bot: Bot):
+# Обработчик события при остановке бота
+async def bot_stop_handler(bot: Bot):
     for item in bot_settings.bots.user_ids:
         try:
             await bot.send_message(item, STOP_BOT_MSG)
+        except TelegramBadRequest:
+            continue
+
+
+# Обработчик события при старте бота
+async def bot_start_handler(bot: Bot):
+    # Работа с файлом-семафором
+    first_run = False
+    if not os.path.isfile(FIRST_LAUNCH_FILE):
+        process = await asyncio.create_subprocess_shell(OS_SEMAPHOR_CREATE)
+        await process.communicate()
+        first_run = True
+
+    # Отправляем приветственное сообщение о начале работы бота
+    for item in bot_settings.bots.user_ids:
+        try:
+            await bot.send_message(item, AFTER_REBOOT_MSG)
+            if first_run:
+                # Оповещаем о первом запуске платы
+                await bot.send_message(item, AFTER_POWER_ON_OFF_MSG)
         except TelegramBadRequest:
             continue
