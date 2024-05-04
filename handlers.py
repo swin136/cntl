@@ -147,9 +147,9 @@ async def start_handler(msg: Message):
         must_access__web_server = False
         try:
             async with aiofiles.open(NET_DEVICE_CARRIER_FILE, mode='r') as linux_file:
-                contents = await linux_file.read()
-                net_device_status_msg = 'Подключение к сети <I>МИС "БАРС"</I> : <b>АКТИВНО</b>'  #'\U000026A0'
-                must_access__web_server = True
+                await linux_file.read()
+            net_device_status_msg = 'Подключение к сети <I>МИС "БАРС"</I> : <b>АКТИВНО</b>'  #'\U000026A0'
+            must_access__web_server = True
         except (FileNotFoundError, OSError):
             net_device_status_msg = 'Подключение к сети <I>МИС "БАРС"</I> : <b>ОТКЛЮЧЕНО </b>' + '\U0001F198'
 
@@ -168,7 +168,10 @@ async def start_handler(msg: Message):
                         if response.status == 200:
                             await msg.answer('\U00002705' + f" Веб-сервер МИС Барс <b>ДОСТУПЕН!</b>!")
                         else:
-                            await msg.answer('\U000026A0' + f" Проблемы с доступом к веб-серверу <b>МИС Барс</b>!")
+                            user_msg = '\U000026A0' + f" Проблемы с доступом к веб-серверу <b>МИС Барс</b>!\n"
+                            user_msg = user_msg + f"<tg-spoiler>Код ответа веб-сервера - <b>{response.status}</b></tg-spoiler>"
+                            await msg.answer(user_msg)
+                            #await msg.answer('\U000026A0' + f" Проблемы с доступом к веб-серверу <b>МИС Барс</b>!")
                         # await msg.answer(f"Статус ответа от веб-сервера {SOURCE_WEB_SERVER_URL}: {response.status}")
                 except aiohttp.client_exceptions.ClientConnectionError:
                     await msg.answer('\U0001F534' + f" Веб-сервер МИС Барс <b>НЕДОСТУПЕН!</b>!")
@@ -221,7 +224,9 @@ async def change_net_interfase(cmd_to_change: str, msg: Message):
                         await msg.answer('\U00002705' + f" Веб-сервер МИС Барс <b>ДОСТУПЕН!</b>!")
                     else:
                         # сервер доступен - но отвечает не то что надо - Status Code не равен 200
-                        await msg.answer('\U000026A0' + f" Пробелемы с доступом к веб-серверу <b>МИС Барс</b>!")
+                        user_msg = '\U000026A0' + f" Проблемы с доступом к веб-серверу <b>МИС Барс</b>!\n"
+                        user_msg = user_msg + f"<tg-spoiler>Код ответа веб-сервера - <b>{response.status}</b></tg-spoiler>"
+                        await msg.answer(user_msg)
             except aiohttp.client_exceptions.ClientConnectionError:
                 # Не смоглм связаться с веб-сервером
                 await msg.answer('\U0001F534' + f" Веб-сервер МИС Барс <b>НЕДОСТУПЕН!</b>!")
