@@ -34,8 +34,10 @@ SYSTEM_REBOOT_CMD = '/sbin/shutdown -r +2'
 SYSTEM_UP_NETWORK_CMD = 'sudo /sbin/ip link set eth0 up'
 SYSTEM_DOWN_NETWORK_CMD = 'sudo /sbin/ip link set eth0 down'
 
-TARGET = '100.117.0.1'
-GTW = '192.168.1.1'
+TARGET = '10.20.3.9'
+WEB_PROTOCOL = 'http://'
+WEB_PORT = ''
+GTW = '10.21.147.65'
 
 RESTORE_ROUTE = f'sudo /sbin/ip route add {TARGET} via {GTW}'
 # Команда для получения информации о процессоре(ах)
@@ -83,7 +85,8 @@ RELEASE_BOARD_FILE = '/etc/orangepi-release'
 FIRST_LAUNCH_FILE = '/tmp/orange.tmp'
 
 # URL_WEB_Server
-SOURCE_WEB_SERVER_URL = 'http://192.168.1.1'
+#SOURCE_WEB_SERVER_URL = 'http://10.20.3.9'
+SOURCE_WEB_SERVER_URL = "".join((WEB_PROTOCOL, TARGET, WEB_PORT))
 
 # Узлы для проверки работоспособности сети
 TEST_NETWORK_HOSTS = {
