@@ -1,3 +1,9 @@
+# Параметры для доступа к МИС БАРС
+TARGET = '10.20.3.9'
+WEB_PROTOCOL = 'http://'
+WEB_PORT = ''
+GTW = '10.21.151.65'
+
 # Текстовые сообщения, передаваемые через Telegram-бота 
 HELLO_MSG = "Добро пожаловать в бот-помощник <b>'МИС Барс'</b>. Ваше действие:"
 REBOOT_MSG = 'Отправлен сигнал на перезагрузку точки доступа к <b>МИС "Барс"</b>.'
@@ -33,11 +39,6 @@ SYSTEM_REBOOT_CMD = '/sbin/shutdown -r +2'
 # orangepi  ALL=NOPASSWD: /sbin/ip
 SYSTEM_UP_NETWORK_CMD = 'sudo /sbin/ip link set eth0 up'
 SYSTEM_DOWN_NETWORK_CMD = 'sudo /sbin/ip link set eth0 down'
-
-TARGET = '10.20.3.9'
-WEB_PROTOCOL = 'http://'
-WEB_PORT = ''
-GTW = '10.21.147.65'
 
 RESTORE_ROUTE = f'sudo /sbin/ip route add {TARGET} via {GTW}'
 # Команда для получения информации о процессоре(ах)
