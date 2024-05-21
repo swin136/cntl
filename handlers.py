@@ -289,7 +289,7 @@ async def start_handler(msg: Message):
         help_msg = help_msg + "<b>/net_test</b> - тест соединения с Интернетом\n" 
         help_msg = help_msg + '<b>/addr</b> - данные по сетевым адресам устройства\n'
         help_msg = help_msg + '<b>/route</b> - таблица маршрутизации устройства\n'
-        help_msg = help_msg + '<b>/lastip</b> - последний полученный ip-адрес по DHCP\n'
+        #help_msg = help_msg + '<b>/lastip</b> - последний полученный ip-адрес по DHCP\n'
         help_msg = help_msg + '<b>/info</b> - информация об устройстве\n'
         help_msg = help_msg + "<b><I>/help</I></b> - вывести справку по командам бота"
         await msg.answer(help_msg)
