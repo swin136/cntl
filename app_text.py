@@ -18,6 +18,7 @@ AUTO_SSH_FOUND_MSG = 'Процесс <b>AUTOSSH</b> найден.'
 AUTO_SSH_NO_FOUND_MSG = 'Процесс <b>AUTOSSH</b> не найден.'
 AUTO_SSH_START_MSG = 'Процесс <b>AUTOSSH</b> запущен/перезапущен.'
 START_NETWORK_TEST_MSG = '<b>Начало тестирования доступа к Интернет-ресурсам ...</b>.'
+VIEW_LOG_ERROR = 'При просмотре логов устройства <tg-spoiler><b><I><u>Бегемотик</u></I></b></tg-spoiler> прозошла ошибка!'
 
 
 NO_TEMP_FOUND = "Температура: <I>нет данных</I>"
@@ -58,6 +59,11 @@ SEARCH_AUTUSSH_CMD = 'pidof autossh'
 # Команда на запуск autossh с параметрами
 # параметры ssh см. в файле ~/.ssh/config
 RUN_AUTUSSH_CMD = 'autossh -M 0 -f -N bars-gw &'
+
+# Количестов записей системного журнала для просмотра
+LAST_RECORD_COUNT = 10
+# Команда просмотра последних записей системного журнала
+VIEW_LAST_RECORDS_JOURNAL = f'journalctl -e -n {LAST_RECORD_COUNT}'
 
 
 # Имена файлов из каталога /proc для получения данных о системе
