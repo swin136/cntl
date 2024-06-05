@@ -29,6 +29,7 @@ from app_text import TEST_NETWORK_HOSTS
 from app_text import START_NETWORK_TEST_MSG, STOP_BOT_MSG  
 from app_text import OS_SEMAPHOR_CREATE, FIRST_LAUNCH_FILE 
 from app_text import AFTER_REBOOT_MSG, AFTER_POWER_ON_OFF_MSG
+from app_text import VIEW_LAST_RECORDS_JOURNAL, VIEW_LOG_ERROR
 
 from app_utils import ping_host
 
@@ -289,6 +290,7 @@ async def start_handler(msg: Message):
         help_msg = help_msg + "<b>/net_test</b> - тест соединения с Интернетом\n" 
         help_msg = help_msg + '<b>/addr</b> - данные по сетевым адресам устройства\n'
         help_msg = help_msg + '<b>/route</b> - таблица маршрутизации устройства\n'
+        help_msg = help_msg + '<b>/journal_view</b> - последние записи системного журнала\n'
         #help_msg = help_msg + '<b>/lastip</b> - последний полученный ip-адрес по DHCP\n'
         help_msg = help_msg + '<b>/info</b> - информация об устройстве\n'
         help_msg = help_msg + "<b><I>/help</I></b> - вывести справку по командам бота"
@@ -619,3 +621,26 @@ async def bot_start_handler(bot: Bot):
                 await bot.send_message(item, AFTER_POWER_ON_OFF_MSG)
         except TelegramBadRequest:
             continue
+
+# Обработчик для ЗАПУСКА/ПЕРЕЗАПУСКА ssh-клиента (в обертке c AutoSSH)
+@router.message(Command("journal_view"))
+async def start_handler(msg: Message):
+    if msg.from_user.id in bot_settings.bots.user_ids:
+        proc = await asyncio.create_subprocess_shell(
+            VIEW_LAST_RECORDS_JOURNAL,
+            stdout = asyncio.subprocess.PIPE,
+            stderr = asyncio.subprocess.PIPE
+        )
+        # '\U00002705 '
+
+        stdout, stderr = await proc.communicate()
+        if proc.returncode == 0:
+            log_view = str(stdout.decode())
+
+            log_view_lst = ['\U00002705 ' + item  for item in log_view.split('\n') if item.strip() != ""] 
+            try:
+                await msg.answer('Последние записи системного журнала устройства:\n' + "\n".join(log_view_lst))
+            except  TelegramBadRequest:
+                await msg.answer(VIEW_LOG_ERROR + " \U0001F198")
+        else:
+            await msg.answer(VIEW_LOG_ERROR + " \U0001F198" )
