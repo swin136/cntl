@@ -61,7 +61,7 @@ SEARCH_AUTUSSH_CMD = 'pidof autossh'
 RUN_AUTUSSH_CMD = 'autossh -M 0 -f -N bars-gw &'
 
 # Количестов записей системного журнала для просмотра
-LAST_RECORD_COUNT = 10
+LAST_RECORD_COUNT = 20
 # Команда просмотра последних записей системного журнала
 VIEW_LAST_RECORDS_JOURNAL = f'journalctl -e -n {LAST_RECORD_COUNT}'
 
