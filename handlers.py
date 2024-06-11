@@ -638,9 +638,13 @@ async def start_handler(msg: Message):
             log_view = str(stdout.decode())
 
             log_view_lst = ['\U00002705 ' + item  for item in log_view.split('\n') if item.strip() != ""] 
+            # Делаем новый список и правим в нем тег <info> - иначе  await msg.answer завершается с исключением  TelegramBadRequest         
+            log_view_lst_modify = []
+            for item in log_view_lst:
+                log_view_lst_modify.append(item.replace('<info>', '"INFO"'))
             try:
-                await msg.answer('Последние записи системного журнала устройства:\n' + "\n".join(log_view_lst))
-            except  TelegramBadRequest:
-                await msg.answer(VIEW_LOG_ERROR + " \U0001F198")
+                await msg.answer('<b>Последние записи системного журнала устройства:</b>\n' + "\n".join(log_view_lst_modify))
+            except TelegramBadRequest:
+                 await msg.answer(VIEW_LOG_ERROR + " \U0001F198")
         else:
             await msg.answer(VIEW_LOG_ERROR + " \U0001F198" )
