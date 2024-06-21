@@ -642,6 +642,7 @@ async def start_handler(msg: Message):
             log_view_lst_modify = []
             for item in log_view_lst:
                 log_view_lst_modify.append(item.replace('<info>', '"INFO"'))
+                log_view_lst_modify.append(' ')
             try:
                 await msg.answer('<b>Последние записи системного журнала устройства:</b>\n' + "\n".join(log_view_lst_modify))
             except TelegramBadRequest:
